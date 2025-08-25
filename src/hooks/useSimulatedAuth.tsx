@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 // Types pour l'authentification simulée
@@ -92,6 +93,22 @@ export const SimulatedAuthProvider = ({ children }: { children: ReactNode }) => 
       return { success: true };
     }
 
+    // Vérifier dans les utilisateurs créés dynamiquement
+    const storedUserData = localStorage.getItem(`user_${email.toLowerCase()}`);
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+        if (userData.password === password) {
+          setUser(userData.user);
+          localStorage.setItem('simulatedUser', JSON.stringify(userData.user));
+          setLoading(false);
+          return { success: true };
+        }
+      } catch (error) {
+        console.error('Erreur lors de la lecture des données utilisateur:', error);
+      }
+    }
+
     setLoading(false);
     return { success: false, error: 'Email ou mot de passe incorrect' };
   };
@@ -156,4 +173,3 @@ export const useSimulatedAuth = () => {
   }
   return context;
 };
-
